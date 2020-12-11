@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_formulario_post_remove"
+        android:icon="@drawable/ic_action_remover"
+        android:title="Remover"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_formulario_post_enviar"
+        android:icon="@drawable/ic_action_enviar"
+        android:title="Enviar"
+        app:showAsAction="ifRoom" />
+</menu>

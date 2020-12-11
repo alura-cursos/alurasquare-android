@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/listaPosts">
+    <fragment
+        android:id="@+id/formularioPost"
+        android:name="br.com.alura.alurasquare.ui.fragment.FormularioPostFragment"
+        android:label="Novo post"
+        tools:layout="@layout/formulario_post">
+        <argument
+            android:name="postId"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/listaPosts"
+        android:name="br.com.alura.alurasquare.ui.fragment.ListaPostsFragment"
+        android:label="Posts"
+        tools:layout="@layout/lista_posts">
+        <action
+            android:id="@+id/acao_listaPosts_para_formularioPost"
+            app:destination="@id/formularioPost"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+</navigation>
