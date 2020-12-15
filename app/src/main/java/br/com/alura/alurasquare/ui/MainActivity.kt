@@ -36,24 +36,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
-        val storage: FirebaseStorage = Firebase.storage
-
-        lifecycleScope.launchWhenCreated {
-            val resultado = storage.reference.listAll().await()
-            resultado.items.forEach { item ->
-                Log.i("MainActivity", "onCreate: nome do item ${item.name}")
-                val url = item.downloadUrl.await()
-                Log.i("MainActivity", "onCreate: url de download do arquivo $url")
-                binding.imageView.load(url)
-            }
-
-        }
-
-
-
-
         setSupportActionBar(binding.activityMainToolbar)
         controlador.addOnDestinationChangedListener { _: NavController, navDestination: NavDestination, _: Bundle? ->
             title = navDestination.label

@@ -22,7 +22,7 @@
                 android:contentDescription="Imagem do local"
                 android:scaleType="centerCrop"
                 android:src="@drawable/imagem_insercao_padrao"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/formulario_post_avaliacao" />

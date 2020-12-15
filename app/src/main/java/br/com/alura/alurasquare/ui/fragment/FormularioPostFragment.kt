@@ -1,8 +1,10 @@
 package br.com.alura.alurasquare.ui.fragment
 
 import android.app.AlertDialog
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.*
+import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -14,8 +16,12 @@ import br.com.alura.alurasquare.repository.Resultado
 import br.com.alura.alurasquare.ui.viewmodel.Componentes
 import br.com.alura.alurasquare.ui.viewmodel.EstadoAppViewModel
 import br.com.alura.alurasquare.ui.viewmodel.FormularioPostViewModel
+import coil.load
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
+import java.io.ByteArrayOutputStream
 
 class FormularioPostFragment : Fragment() {
 
@@ -54,6 +60,7 @@ class FormularioPostFragment : Fragment() {
             )
         )
         tentaCarregarPost()
+        binding.formularioPostImagem.load("https://images.pexels.com/photos/97906/pexels-photo-97906.jpeg")
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -82,7 +89,26 @@ class FormularioPostFragment : Fragment() {
             mensagem = mensagem,
             avaliacao = avaliacao
         )
-        enviaPost(postNovo)
+
+        val storage = Firebase.storage
+        val saoPauloRef = storage.reference.child("sao-paulo.jpg")
+        val postsSaoPauloRef = storage.reference.child("posts/sao-paulo.jpg")
+
+        val imageView = binding.formularioPostImagem
+        val bitmap = imageView.drawable.toBitmap()
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val dados = baos.toByteArray()
+
+        var uploadTask = postsSaoPauloRef.putBytes(dados)
+        uploadTask.addOnFailureListener {
+            view?.snackbar("Falha ao enviar a imagem")
+        }.addOnSuccessListener { taskSnapshot ->
+            view?.snackbar("Imagem enviada")
+        }
+
+
+//        enviaPost(postNovo)
     }
 
     private fun enviaPost(post: Post) {
