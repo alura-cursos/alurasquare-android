@@ -3,7 +3,8 @@ package br.com.alura.alurasquare.repository
 import br.com.alura.alurasquare.model.Post
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
@@ -14,11 +15,26 @@ class PostRepository(
     private val firestore: FirebaseFirestore
 ) {
 
-    suspend fun salva(post: Post) {
-        firestore.collection(NOME_COLECACAO)
+    suspend fun salva(post: Post): String {
+        val documento = firestore.collection(NOME_COLECACAO)
             .document()
+        documento
             .set(DocumentoPost(post))
             .await()
+        return documento.id
+    }
+
+    suspend fun enviaImagem(postId: String, imagem: ByteArray){
+        val storage = Firebase.storage
+        val referencia = storage.reference.child("posts/$postId.jpg")
+        referencia.putBytes(imagem).await()
+        val url = referencia.downloadUrl.await()
+
+        firestore.collection(NOME_COLECACAO)
+            .document(postId)
+            .update(mapOf("imagem" to url.toString()))
+            .await()
+
     }
 
     suspend fun edita(post: Post) {

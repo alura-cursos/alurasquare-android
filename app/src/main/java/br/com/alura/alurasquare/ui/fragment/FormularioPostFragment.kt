@@ -17,8 +17,6 @@ import br.com.alura.alurasquare.ui.viewmodel.Componentes
 import br.com.alura.alurasquare.ui.viewmodel.EstadoAppViewModel
 import br.com.alura.alurasquare.ui.viewmodel.FormularioPostViewModel
 import coil.load
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.io.ByteArrayOutputStream
@@ -89,26 +87,7 @@ class FormularioPostFragment : Fragment() {
             mensagem = mensagem,
             avaliacao = avaliacao
         )
-
-        val storage = Firebase.storage
-        val saoPauloRef = storage.reference.child("sao-paulo.jpg")
-        val postsSaoPauloRef = storage.reference.child("posts/sao-paulo.jpg")
-
-        val imageView = binding.formularioPostImagem
-        val bitmap = imageView.drawable.toBitmap()
-        val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-        val dados = baos.toByteArray()
-
-        var uploadTask = postsSaoPauloRef.putBytes(dados)
-        uploadTask.addOnFailureListener {
-            view?.snackbar("Falha ao enviar a imagem")
-        }.addOnSuccessListener { taskSnapshot ->
-            view?.snackbar("Imagem enviada")
-        }
-
-
-//        enviaPost(postNovo)
+        enviaPost(postNovo)
     }
 
     private fun enviaPost(post: Post) {
@@ -132,7 +111,12 @@ class FormularioPostFragment : Fragment() {
     }
 
     private fun salva(post: Post) {
-        viewModel.salva(post).observe(viewLifecycleOwner) { resultado ->
+        val imageView = binding.formularioPostImagem
+        val bitmap = imageView.drawable.toBitmap()
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val imagem = baos.toByteArray()
+        viewModel.salva(post, imagem).observe(viewLifecycleOwner) { resultado ->
             when (resultado) {
                 is Resultado.Sucesso -> controlador.popBackStack()
                 is Resultado.Erro -> binding.formularioPostCoordinator

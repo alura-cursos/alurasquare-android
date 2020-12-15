@@ -1,5 +1,6 @@
 package br.com.alura.alurasquare.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.liveData
@@ -14,12 +15,14 @@ class FormularioPostViewModel(
 
     fun buscaPost(id: String) = repository.buscaPorId(id).asLiveData()
 
-    fun salva(post: Post) =
+    fun salva(post: Post, imagem: ByteArray) =
         liveData<Resultado<Unit>>(viewModelScope.coroutineContext) {
             try {
-                repository.salva(post)
+                val id = repository.salva(post)
+                repository.enviaImagem(id, imagem)
                 emit(Resultado.Sucesso())
             } catch (e: Exception) {
+                Log.e("FormPostVM", "salva: falha ao enviar post", e)
                 emit(Resultado.Erro(e))
             }
         }
