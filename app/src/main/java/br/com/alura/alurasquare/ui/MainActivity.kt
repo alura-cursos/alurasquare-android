@@ -13,6 +13,7 @@ import androidx.navigation.fragment.NavHostFragment
 import br.com.alura.alurasquare.R
 import br.com.alura.alurasquare.databinding.ActivityMainBinding
 import br.com.alura.alurasquare.ui.viewmodel.EstadoAppViewModel
+import coil.load
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
@@ -31,6 +32,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding.imageView.load("endereco_da_imagem_armazenada_no_storage")
         setSupportActionBar(binding.activityMainToolbar)
         controlador.addOnDestinationChangedListener { _: NavController, navDestination: NavDestination, _: Bundle? ->
             title = navDestination.label
