@@ -14,6 +14,10 @@ import br.com.alura.alurasquare.R
 import br.com.alura.alurasquare.databinding.ActivityMainBinding
 import br.com.alura.alurasquare.ui.viewmodel.EstadoAppViewModel
 import coil.load
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.tasks.await
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
@@ -32,7 +36,24 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding.imageView.load("endereco_da_imagem_armazenada_no_storage")
+
+
+        val storage: FirebaseStorage = Firebase.storage
+
+        lifecycleScope.launchWhenCreated {
+            val resultado = storage.reference.listAll().await()
+            resultado.items.forEach { item ->
+                Log.i("MainActivity", "onCreate: nome do item ${item.name}")
+                val url = item.downloadUrl.await()
+                Log.i("MainActivity", "onCreate: url de download do arquivo $url")
+                binding.imageView.load(url)
+            }
+
+        }
+
+
+
+
         setSupportActionBar(binding.activityMainToolbar)
         controlador.addOnDestinationChangedListener { _: NavController, navDestination: NavDestination, _: Bundle? ->
             title = navDestination.label
