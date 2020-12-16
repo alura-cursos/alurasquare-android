@@ -84,20 +84,23 @@ class PostRepository(
 private class DocumentoPost(
     val local: String = "",
     val mensagem: String = "",
-    val avaliacao: Float = 0.0f
+    val avaliacao: Float = 0.0f,
+    val imagem: String? = null
 ) {
 
     constructor(post: Post) : this(
         local = post.local,
         mensagem = post.mensagem,
-        avaliacao = post.avaliacao
+        avaliacao = post.avaliacao,
+        imagem = post.imagem
     )
 
     fun paraPost(id: String? = null) = Post(
         id = id,
         local = local,
         mensagem = mensagem,
-        avaliacao = avaliacao
+        avaliacao = avaliacao,
+        imagem = imagem
     )
 
 }
