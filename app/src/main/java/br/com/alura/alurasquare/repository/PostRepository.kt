@@ -28,6 +28,11 @@ class PostRepository(
 
     suspend fun enviaImagem(postId: String, imagem: ByteArray){
         GlobalScope.launch {
+            firestore.collection(NOME_COLECACAO)
+                .document(postId)
+                .update(mapOf("temImagem" to true))
+                .await()
+
             val storage = Firebase.storage
             val referencia = storage.reference.child("posts/$postId.jpg")
             referencia.putBytes(imagem).await()
@@ -88,14 +93,16 @@ private class DocumentoPost(
     val local: String = "",
     val mensagem: String = "",
     val avaliacao: Float = 0.0f,
-    val imagem: String? = null
+    val imagem: String? = null,
+    val temImagem: Boolean = false
 ) {
 
     constructor(post: Post) : this(
         local = post.local,
         mensagem = post.mensagem,
         avaliacao = post.avaliacao,
-        imagem = post.imagem
+        imagem = post.imagem,
+        temImagem = post.temImagem
     )
 
     fun paraPost(id: String? = null) = Post(
@@ -103,7 +110,8 @@ private class DocumentoPost(
         local = local,
         mensagem = mensagem,
         avaliacao = avaliacao,
-        imagem = imagem
+        imagem = imagem,
+        temImagem = temImagem
     )
 
 }

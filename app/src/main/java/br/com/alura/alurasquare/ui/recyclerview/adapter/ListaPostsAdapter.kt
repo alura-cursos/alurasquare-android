@@ -7,6 +7,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import br.com.alura.alurasquare.R
 import br.com.alura.alurasquare.databinding.ItemPostBinding
 import br.com.alura.alurasquare.model.Post
 import coil.load
@@ -63,12 +64,21 @@ class ListaPostsAdapter(
             binding.itemPostLocal.text = post.local
             binding.itemPostMensagem.text = post.mensagem
             binding.itemPostAvaliacao.rating = post.avaliacao
-            Log.i("ListaPostsAdapter", "vincula: imagem do post ${post.imagem}")
-            val visibilidade = post.imagem?.let {
+
+            val visibilidade = if(post.temImagem){
+                binding.itemPostImagem.load(R.drawable.imagem_carregando_placeholder)
                 VISIBLE
-            } ?: GONE
+            } else {
+                GONE
+            }
             binding.itemPostImagem.visibility = visibilidade
-            binding.itemPostImagem.load(post.imagem)
+            post.imagem?.let { imagem ->
+                binding.itemPostImagem.load(imagem) {
+                    placeholder(R.drawable.imagem_carregando_placeholder)
+                    crossfade(true)
+                }
+            }
+
         }
 
     }

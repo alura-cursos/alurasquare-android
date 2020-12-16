@@ -5,5 +5,6 @@ data class Post(
     val local: String,
     val mensagem: String,
     val avaliacao: Float = 0.0f,
-    val imagem: String? = null
+    val imagem: String? = null,
+    val temImagem: Boolean = false
 )

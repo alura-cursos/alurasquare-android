@@ -85,7 +85,7 @@ class FormularioPostFragment : Fragment() {
             id = postId,
             local = local,
             mensagem = mensagem,
-            avaliacao = avaliacao
+            avaliacao = avaliacao,
         )
         enviaPost(postNovo)
     }
