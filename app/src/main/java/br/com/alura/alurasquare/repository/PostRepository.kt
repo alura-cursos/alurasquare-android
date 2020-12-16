@@ -5,8 +5,10 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 private const val NOME_COLECACAO = "posts"
@@ -25,16 +27,17 @@ class PostRepository(
     }
 
     suspend fun enviaImagem(postId: String, imagem: ByteArray){
-        val storage = Firebase.storage
-        val referencia = storage.reference.child("posts/$postId.jpg")
-        referencia.putBytes(imagem).await()
-        val url = referencia.downloadUrl.await()
+        GlobalScope.launch {
+            val storage = Firebase.storage
+            val referencia = storage.reference.child("posts/$postId.jpg")
+            referencia.putBytes(imagem).await()
+            val url = referencia.downloadUrl.await()
 
-        firestore.collection(NOME_COLECACAO)
-            .document(postId)
-            .update(mapOf("imagem" to url.toString()))
-            .await()
-
+            firestore.collection(NOME_COLECACAO)
+                .document(postId)
+                .update(mapOf("imagem" to url.toString()))
+                .await()
+        }
     }
 
     suspend fun edita(post: Post) {

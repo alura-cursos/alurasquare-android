@@ -19,8 +19,8 @@ class FormularioPostViewModel(
         liveData<Resultado<Unit>>(viewModelScope.coroutineContext) {
             try {
                 val id = repository.salva(post)
-                repository.enviaImagem(id, imagem)
                 emit(Resultado.Sucesso())
+                repository.enviaImagem(id, imagem)
             } catch (e: Exception) {
                 Log.e("FormPostVM", "salva: falha ao enviar post", e)
                 emit(Resultado.Erro(e))
