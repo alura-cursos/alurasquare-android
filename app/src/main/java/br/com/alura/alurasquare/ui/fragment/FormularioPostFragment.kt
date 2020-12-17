@@ -4,7 +4,6 @@ import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import androidx.core.graphics.drawable.toBitmap
@@ -117,7 +116,8 @@ class FormularioPostFragment : Fragment() {
     }
 
     private fun edita(post: Post) {
-        viewModel.edita(post).observe(viewLifecycleOwner) {
+        val imagem = devolveImagemDoPost()
+        viewModel.edita(post, imagem).observe(viewLifecycleOwner) {
             it?.let { resultado ->
                 when (resultado) {
                     is Resultado.Sucesso -> controlador.popBackStack()
@@ -129,11 +129,7 @@ class FormularioPostFragment : Fragment() {
     }
 
     private fun salva(post: Post) {
-        val imageView = binding.formularioPostImagem
-        val bitmap = imageView.drawable.toBitmap()
-        val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-        val imagem = baos.toByteArray()
+        val imagem = devolveImagemDoPost()
         viewModel.salva(post, imagem).observe(viewLifecycleOwner) { resultado ->
             when (resultado) {
                 is Resultado.Sucesso -> controlador.popBackStack()
@@ -141,6 +137,15 @@ class FormularioPostFragment : Fragment() {
                     .snackbar(mensagem = "Post não foi enviada")
             }
         }
+    }
+
+    private fun devolveImagemDoPost(): ByteArray {
+        val imageView = binding.formularioPostImagem
+        val bitmap = imageView.drawable.toBitmap()
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val imagem = baos.toByteArray()
+        return imagem
     }
 
     private fun tentaCarregarPost() {
@@ -156,6 +161,9 @@ class FormularioPostFragment : Fragment() {
         binding.formularioPostLocal.setText(post.local)
         binding.formularioPostMensagem.setText(post.mensagem)
         binding.formularioPostAvaliacao.rating = post.avaliacao
+        post.imagem?.let { imagem ->
+             binding.formularioPostImagem.load(imagem)
+        }
     }
 
     private fun apresentaDialogoDeRemocao() {

@@ -37,11 +37,14 @@ class FormularioPostViewModel(
             }
         }
 
-    fun edita(post: Post) =
+    fun edita(post: Post, imagem: ByteArray) =
         liveData<Resultado<Unit>>(viewModelScope.coroutineContext) {
             try {
                 repository.edita(post)
                 emit(Resultado.Sucesso())
+                post.id?.let { postId ->
+                    repository.enviaImagem(postId, imagem)
+                }
             } catch (e: Exception) {
                 emit(Resultado.Erro(e))
             }
