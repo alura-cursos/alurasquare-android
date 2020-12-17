@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import br.com.alura.alurasquare.R
 import br.com.alura.alurasquare.databinding.FormularioPostBinding
+import br.com.alura.alurasquare.databinding.OpcoesImagemPostBinding
 import br.com.alura.alurasquare.extensions.snackbar
 import br.com.alura.alurasquare.model.Post
 import br.com.alura.alurasquare.repository.Resultado
@@ -19,6 +20,8 @@ import br.com.alura.alurasquare.ui.viewmodel.Componentes
 import br.com.alura.alurasquare.ui.viewmodel.EstadoAppViewModel
 import br.com.alura.alurasquare.ui.viewmodel.FormularioPostViewModel
 import coil.load
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.io.ByteArrayOutputStream
@@ -63,10 +66,25 @@ class FormularioPostFragment : Fragment() {
         )
         tentaCarregarPost()
         binding.formularioPostImagem.setOnClickListener {
-            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                type = "image/*"
+
+            val dialogo = BottomSheetDialog(requireContext())
+            val bindingOpcoesImagem = OpcoesImagemPostBinding.inflate(layoutInflater)
+
+            bindingOpcoesImagem.opcoesImagemPostGaleria.setOnClickListener {
+                val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                    type = "image/*"
+                }
+                startActivityForResult(intent, REQUEST_IMAGE_GET)
+                dialogo.behavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
-            startActivityForResult(intent, REQUEST_IMAGE_GET)
+            bindingOpcoesImagem.opcoesImagemPostRemover.setOnClickListener {
+                dialogo.behavior.state = BottomSheetBehavior.STATE_HIDDEN
+            }
+
+            dialogo.setContentView(bindingOpcoesImagem.root)
+            dialogo.show()
+
+
         }
     }
 
