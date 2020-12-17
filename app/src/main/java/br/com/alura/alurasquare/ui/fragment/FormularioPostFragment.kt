@@ -1,7 +1,10 @@
 package br.com.alura.alurasquare.ui.fragment
 
+import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
+import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import androidx.core.graphics.drawable.toBitmap
@@ -20,6 +23,8 @@ import coil.load
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.io.ByteArrayOutputStream
+
+private const val REQUEST_IMAGE_GET = 1
 
 class FormularioPostFragment : Fragment() {
 
@@ -58,7 +63,20 @@ class FormularioPostFragment : Fragment() {
             )
         )
         tentaCarregarPost()
-        binding.formularioPostImagem.load("https://images.pexels.com/photos/97906/pexels-photo-97906.jpeg")
+        binding.formularioPostImagem.setOnClickListener {
+            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                type = "image/*"
+            }
+            startActivityForResult(intent, REQUEST_IMAGE_GET)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_IMAGE_GET && resultCode == RESULT_OK) {
+            data?.data?.let { imagem ->
+                binding.formularioPostImagem.load(imagem)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
