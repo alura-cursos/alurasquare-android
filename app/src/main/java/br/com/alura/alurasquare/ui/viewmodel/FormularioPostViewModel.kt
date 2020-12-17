@@ -1,10 +1,7 @@
 package br.com.alura.alurasquare.ui.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import br.com.alura.alurasquare.model.Post
 import br.com.alura.alurasquare.repository.PostRepository
 import br.com.alura.alurasquare.repository.Resultado
@@ -13,6 +10,9 @@ class FormularioPostViewModel(
     private val repository: PostRepository
 ) : ViewModel() {
 
+    private val _imagemCarregada = MutableLiveData<String?>()
+    val imagemCarregada: LiveData<String?> = _imagemCarregada
+
     fun buscaPost(id: String) = repository.buscaPorId(id).asLiveData()
 
     fun salva(post: Post, imagem: ByteArray) =
@@ -20,7 +20,7 @@ class FormularioPostViewModel(
             try {
                 val id = repository.salva(post)
                 emit(Resultado.Sucesso())
-                repository.enviaImagem(id, imagem)
+                tentaEnviarImagem(id, imagem)
             } catch (e: Exception) {
                 Log.e("FormPostVM", "salva: falha ao enviar post", e)
                 emit(Resultado.Erro(e))
@@ -43,11 +43,25 @@ class FormularioPostViewModel(
                 repository.edita(post)
                 emit(Resultado.Sucesso())
                 post.id?.let { postId ->
-                    repository.enviaImagem(postId, imagem)
+                    tentaEnviarImagem(postId, imagem)
                 }
             } catch (e: Exception) {
                 emit(Resultado.Erro(e))
             }
         }
+
+    private suspend fun tentaEnviarImagem(postId: String, imagem: ByteArray) {
+        imagemCarregada.value?.let {
+            repository.enviaImagem(postId, imagem)
+        }
+    }
+
+    fun atualizaImagem(imagem: String) {
+        _imagemCarregada.postValue(imagem)
+    }
+
+    fun removeImagem() {
+        _imagemCarregada.postValue(null)
+    }
 
 }
