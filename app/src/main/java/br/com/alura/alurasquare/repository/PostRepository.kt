@@ -45,6 +45,14 @@ class PostRepository(
         }
     }
 
+    suspend fun removeImagem(postId: String) {
+        GlobalScope.launch {
+            val storage = Firebase.storage
+            val referencia = storage.reference.child("posts/$postId.jpg")
+            referencia.delete().await()
+        }
+    }
+
     suspend fun edita(post: Post) {
         val postId =
             post.id ?: throw IllegalArgumentException("Id não pode ser nulo ao editar um post")

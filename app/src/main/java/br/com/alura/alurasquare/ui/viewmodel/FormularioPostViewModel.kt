@@ -32,6 +32,7 @@ class FormularioPostViewModel(
             try {
                 repository.remove(postId)
                 emit(Resultado.Sucesso())
+                repository.removeImagem(postId)
             } catch (e: Exception) {
                 emit(Resultado.Erro(e))
             }
