@@ -1,10 +1,10 @@
 package br.com.alura.alurasquare.repository
 
+import android.util.Log
 import br.com.alura.alurasquare.model.Post
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -12,9 +12,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 private const val NOME_COLECACAO = "posts"
+private const val TAG = "PostRepository"
 
 class PostRepository(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val storage: FirebaseStorage
 ) {
 
     suspend fun salva(post: Post): String {
@@ -26,30 +28,37 @@ class PostRepository(
         return documento.id
     }
 
-    suspend fun enviaImagem(postId: String, imagem: ByteArray){
+    suspend fun enviaImagem(postId: String, imagem: ByteArray) {
         GlobalScope.launch {
-            firestore.collection(NOME_COLECACAO)
-                .document(postId)
-                .update(mapOf("temImagem" to true))
-                .await()
+            try {
+                val documento = firestore.collection(NOME_COLECACAO)
+                    .document(postId)
 
-            val storage = Firebase.storage
-            val referencia = storage.reference.child("posts/$postId.jpg")
-            referencia.putBytes(imagem).await()
-            val url = referencia.downloadUrl.await()
+                documento
+                    .update(mapOf("temImagem" to true))
+                    .await()
 
-            firestore.collection(NOME_COLECACAO)
-                .document(postId)
-                .update(mapOf("imagem" to url.toString()))
-                .await()
+                val referencia = storage.reference.child("posts/$postId.jpg")
+                referencia.putBytes(imagem).await()
+                val url = referencia.downloadUrl.await()
+
+                documento
+                    .update(mapOf("imagem" to url.toString()))
+                    .await()
+            } catch (e: Exception) {
+                Log.e(TAG, "enviaImagem: falha ao enviar a imagem", e)
+            }
         }
     }
 
     suspend fun removeImagem(postId: String) {
         GlobalScope.launch {
-            val storage = Firebase.storage
-            val referencia = storage.reference.child("posts/$postId.jpg")
-            referencia.delete().await()
+            try {
+                val referencia = storage.reference.child("posts/$postId.jpg")
+                referencia.delete().await()
+            } catch (e: Exception) {
+                Log.e(TAG, "removeImagem: falha ao remover a imagem", e)
+            }
         }
     }
 

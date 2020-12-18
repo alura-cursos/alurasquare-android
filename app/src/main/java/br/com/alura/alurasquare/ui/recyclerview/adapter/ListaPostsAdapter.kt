@@ -1,7 +1,6 @@
 package br.com.alura.alurasquare.ui.recyclerview.adapter
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -64,8 +63,11 @@ class ListaPostsAdapter(
             binding.itemPostLocal.text = post.local
             binding.itemPostMensagem.text = post.mensagem
             binding.itemPostAvaliacao.rating = post.avaliacao
+            configuraImagemDoPost(post)
+        }
 
-            val visibilidade = if(post.temImagem){
+        private fun configuraImagemDoPost(post: Post) {
+            val visibilidade = if (post.temImagem) {
                 binding.itemPostImagem.load(R.drawable.imagem_carregando_placeholder)
                 VISIBLE
             } else {
@@ -78,7 +80,6 @@ class ListaPostsAdapter(
                     crossfade(true)
                 }
             }
-
         }
 
     }

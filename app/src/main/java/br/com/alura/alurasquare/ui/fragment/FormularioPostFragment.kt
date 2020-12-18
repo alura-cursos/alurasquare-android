@@ -65,34 +65,45 @@ class FormularioPostFragment : Fragment() {
             )
         )
         tentaCarregarPost()
+        configuraCarregamentoDeImagem()
+        configuraPostImagem()
+    }
+
+    private fun configuraPostImagem() {
+        binding.formularioPostImagem.setOnClickListener {
+            apresentaDialogo()
+        }
+    }
+
+    private fun apresentaDialogo() {
+        val dialogo = BottomSheetDialog(requireContext())
+        val bindingOpcoesImagem = OpcoesImagemPostBinding.inflate(layoutInflater)
+        bindingOpcoesImagem.opcoesImagemPostGaleria.setOnClickListener {
+            apresentaGaleria()
+            dialogo.behavior.state = BottomSheetBehavior.STATE_HIDDEN
+        }
+        bindingOpcoesImagem.opcoesImagemPostRemover.setOnClickListener {
+            viewModel.removeImagem()
+            dialogo.behavior.state = BottomSheetBehavior.STATE_HIDDEN
+        }
+        dialogo.setContentView(bindingOpcoesImagem.root)
+        dialogo.show()
+    }
+
+    private fun apresentaGaleria() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "image/*"
+        }
+        startActivityForResult(intent, REQUEST_IMAGE_GET)
+    }
+
+    private fun configuraCarregamentoDeImagem() {
         viewModel.imagemCarregada.observe(viewLifecycleOwner) {
             it?.let { imagem ->
                 binding.formularioPostImagem.load(imagem)
                 return@observe
             }
             binding.formularioPostImagem.load(R.drawable.imagem_insercao_padrao)
-        }
-        binding.formularioPostImagem.setOnClickListener {
-
-            val dialogo = BottomSheetDialog(requireContext())
-            val bindingOpcoesImagem = OpcoesImagemPostBinding.inflate(layoutInflater)
-
-            bindingOpcoesImagem.opcoesImagemPostGaleria.setOnClickListener {
-                val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                    type = "image/*"
-                }
-                startActivityForResult(intent, REQUEST_IMAGE_GET)
-                dialogo.behavior.state = BottomSheetBehavior.STATE_HIDDEN
-            }
-            bindingOpcoesImagem.opcoesImagemPostRemover.setOnClickListener {
-                viewModel.removeImagem()
-                dialogo.behavior.state = BottomSheetBehavior.STATE_HIDDEN
-            }
-
-            dialogo.setContentView(bindingOpcoesImagem.root)
-            dialogo.show()
-
-
         }
     }
 
@@ -170,8 +181,7 @@ class FormularioPostFragment : Fragment() {
         val bitmap = imageView.drawable.toBitmap()
         val baos = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-        val imagem = baos.toByteArray()
-        return imagem
+        return baos.toByteArray()
     }
 
     private fun tentaCarregarPost() {
